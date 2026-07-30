@@ -438,22 +438,6 @@ graph, seed initialisation, propagated labels) is produced by
 
 ---
 
-## Tested Environment
-
-| Component | Specification |
-|---|---|
-| CPU | Intel Xeon W-2295 (18 cores, 3.00 GHz) |
-| RAM | 128 GB DDR4 |
-| GPU | NVIDIA RTX A4000 |
-| Python | 3.10.x |
-| torch | 2.5.1+cu121 |
-| torchvision | 0.20.1+cu121 |
-| numpy / pandas / scipy | 1.24+ / 2.0+ / 1.10+ |
-| networkx / plotly | 3.1+ / 5.15+ |
-| CUDA | 12.1 |
-
----
-
 ## Related Work by the Authors
 
 - **DEFT-DPT**: A Lightweight Multimodal Framework for Egocentric Video Action Recognition.
