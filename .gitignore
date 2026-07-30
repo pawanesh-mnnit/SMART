@@ -1,0 +1,59 @@
+# ---------------------------------------------------------------------------
+# Heavy artifacts — these belong in GitHub Releases, NOT in the repository.
+# A single ADL feature file is several MB; committing them makes the repo
+# unusable to clone.
+# ---------------------------------------------------------------------------
+artifacts/
+artifacts_*/
+checkpoints/
+*.pt
+*.pth
+*.npz
+*.pkl
+!tools/*.pkl
+
+# predicted-label dumps written by evaluate.py --save_labels
+*_predicted_labels*.csv
+
+# ---------------------------------------------------------------------------
+# Datasets — never commit frames
+# ---------------------------------------------------------------------------
+Frames/
+OpticalFlow/
+RGB/
+Flow/
+*.jpg
+*.jpeg
+*.mp4
+*.avi
+!images/*.png
+!images/*.jpg
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+smart_env/
+env/
+
+# ---------------------------------------------------------------------------
+# Notebooks
+# ---------------------------------------------------------------------------
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# ---------------------------------------------------------------------------
+# Editors / OS
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
