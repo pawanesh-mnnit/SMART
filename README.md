@@ -467,16 +467,6 @@ Future work extends the multi-action framework here with action anticipation.
 
 ---
 
-## Contact
-
-- Pawanesh Kumar Vishwakarma — `pawanesh.2023rcs04@mnnit.ac.in`
-- Abhimanyu Sahu (corresponding author) — `abhimanyus@mnnit.ac.in`
-
-Department of Computer Science & Engineering,
-Motilal Nehru National Institute of Technology Allahabad, Prayagraj, India
-
----
-
 ## License
 
 Released under the [CC BY-NC 4.0 License](LICENSE). Free for academic and research
