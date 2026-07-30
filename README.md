@@ -86,49 +86,7 @@ score now depends only on `b_ic`. Removing it costs **15.7 mAP on Charades and
 
 ---
 
-## Results
 
-### Charades — comparison with state of the art
-
-Every competing method is **fully supervised on dense frame-level annotations**.
-SMART uses **10% labelled seed frames**.
-
-| Method | Venue | mAP |
-|---|---|---|
-| TGM | ICML'19 | 20.60 |
-| MLAD | CVPR'21 | 18.40 |
-| PDAN | WACV'21 | 23.70 |
-| Coarse-Fine | CVPR'21 | 25.10 |
-| MS-TCT | CVPR'22 | 25.40 |
-| PointTAD | NeurIPS'22 | 12.10 |
-| PAT | ICCV'23 | 26.50 |
-| DualDETR | CVPR'24 | 15.30 |
-| MS-Temba | CVPR'26 | 33.60 |
-| **SMART (ours)** | — | **37.73** |
-
-SMART matches or exceeds MS-Temba with **75.6% fewer parameters**.
-
-### ADL
-
-| Method | Venue | Top-1 |
-|---|---|---|
-| DAN-EAR | TIP'19 | 48.35 |
-| EAT-MBNet | TCSVT'21 | 81.96 |
-| LSTA | TCSVT'24 | 79.31 |
-| EgoADL | IMWUT'24 | 70.40 |
-| **SMART (ours)** | — | **49.70** |
-
-> These methods perform **fully supervised single-action** recognition, assigning
-> one dominant action per clip. SMART performs **semi-supervised frame-level
-> multi-action** recognition from 10% labelled frames. The numbers are indicative,
-> not directly comparable.
-
-### Headline
-
-| Dataset | mAP | Macro-F1 | Micro-F1 | Top-1 |
-|---|---|---|---|---|
-| **Charades** | **37.73** | 26.26 | 29.71 | **34.53** |
-| **ADL** | **48.17** | 57.45 | 57.12 | **49.70** |
 
 ```bash
 python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 100 --rw_steps 10 --gamma 0.90
@@ -137,24 +95,6 @@ python evaluate.py --data_dir artifacts/adl      --feat_suffix _effnet --window 
 
 ---
 
-## Ablations
-
-All reproducible from `tools/ablations.ipynb` or the command line.
-
-### Component ablation
-
-| Variant | Charades mAP | Charades Top-1 | ADL mAP | ADL Top-1 |
-|---|---|---|---|---|
-| w/o DEFT | 14.87 | 24.05 | 31.17 | 35.25 |
-| w/o CDF sparsification | 35.26 | 28.22 | 44.86 | 48.22 |
-| w/o temporal edges | 35.77 | 28.15 | 45.70 | 38.50 |
-| w/o row-centering | 22.06 | 28.53 | 39.80 | 38.03 |
-| **SMART** | **37.73** | **34.53** | **48.17** | **49.70** |
-
-Removing DEFT is the single largest degradation (−22.9 mAP on Charades),
-confirming that localising the hand–object region is what makes the graph
-meaningful in the first place.
-
 ```bash
 python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 100 --no_row_center
 python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 100 --no_cdf
@@ -162,73 +102,17 @@ python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 
 # w/o DEFT requires re-extraction with a DEFT-free front-end
 ```
 
-### Independent vs joint propagation
-
-| Strategy | Charades mAP | Charades Top-1 | ADL mAP | ADL Top-1 |
-|---|---|---|---|---|
-| Joint propagation | 27.59 | 27.40 | 12.50 | 29.45 |
-| **Independent per-class** | **37.73** | **34.53** | **48.17** | **49.70** |
-
-The ADL collapse (48.17 → 12.50) is the clearest evidence in the paper: when
-classes compete for probability mass, concurrent actions annihilate each other.
-
 ```bash
 python evaluate.py --data_dir artifacts/adl --feat_suffix _effnet --window 100 --prop_mode joint
 ```
-
-### Graph sparsification — CDF vs kNN
-
-| Rule | Value | Charades mAP | Charades Top-1 | ADL mAP | ADL Top-1 |
-|---|---|---|---|---|---|
-| kNN | k = 5 | 33.65 | 22.46 | 46.14 | 46.00 |
-| kNN | k = 10 | 31.12 | 20.44 | 45.80 | 45.60 |
-| kNN | k = 15 | 30.58 | 22.94 | 45.22 | 44.84 |
-| kNN | k = 20 | 30.71 | 20.17 | 44.90 | 44.17 |
-| CDF | γ = 0.80 | 36.31 | 34.00 | 47.10 | 47.37 |
-| CDF | γ = 0.85 | 36.91 | 34.21 | 47.65 | 48.88 |
-| **CDF** | **γ = 0.90** | **37.73** | **34.53** | **48.17** | **49.70** |
-| CDF | γ = 0.95 | 36.01 | 34.12 | 47.37 | 48.80 |
-
-CDF beats every kNN setting on both datasets, and stays within 36.01–37.73 mAP
-across the whole γ range — the graph construction is robust to this parameter.
 
 ```bash
 python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 100 --sparsify knn --knn_k 10
 python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 100 --gamma 0.85
 ```
 
-### Backbone and modality
-
-| Modality | Backbone | Charades mAP | Charades Top-1 | ADL mAP | ADL Top-1 |
-|---|---|---|---|---|---|
-| RGB + Flow | CLIP ViT-B/32 | 34.74 | 27.50 | 46.74 | 49.36 |
-| RGB + Flow | ResNet-50 | 36.91 | 34.12 | 48.00 | 50.25 |
-| RGB only | EfficientNet-B0 | 37.00 | 26.62 | 46.31 | 48.44 |
-| Flow only | EfficientNet-B0 | 29.00 | 19.06 | 45.68 | 46.25 |
-| **RGB + Flow** | **EfficientNet-B0** | **37.73** | **34.53** | **48.17** | **49.70** |
-
-RGB dominates flow (37.00 vs 29.00 on Charades) — appearance carries the primary
-cue for daily-living actions. CLIP underperforms here despite its general
-strength, suggesting its embedding geometry suits graph propagation under sparse
-supervision less well than a supervised ImageNet backbone.
-
 Each row needs its own `extract_features.py` run; then it is only a different
 `--feat_suffix`:
-
-| Row | `--backbone` | `--modality` | `--feat_suffix` |
-|---|---|---|---|
-| CLIP | `clip` | `fusion` | `_clip` |
-| ResNet-50 | `resnet50` | `fusion` | `_resnet` |
-| RGB only | `efficientnet_b0` | `rgbonly` | `_rgbonly` |
-| Flow only | `efficientnet_b0` | `flowonly` | `_flowonly` |
-| **Full** | `efficientnet_b0` | `fusion` | `_effnet` |
-
-### Loss function
-
-| Loss | Charades mAP | ADL mAP |
-|---|---|---|
-| Binary Cross-Entropy | 34.32 | 44.14 |
-| **Asymmetric Loss** | **37.73** | **48.17** |
 
 ```bash
 python train.py ... --loss bce      # vs the default --loss asl
@@ -236,44 +120,11 @@ python train.py ... --loss bce      # vs the default --loss asl
 
 ---
 
-## Statistical Significance
-
-Five independent stratified seed selections, full pipeline re-run each time.
-
-| Metric | Charades SMART | Charades w/o RC | ADL SMART | ADL w/o RC |
-|---|---|---|---|---|
-| mAP | **37.73 ± 0.98** | 22.06 ± 0.65 | **48.17 ± 0.37** | 39.80 ± 0.02 |
-| Macro-F1 | **26.26 ± 1.52** | 16.91 ± 1.95 | **57.45 ± 0.33** | 24.97 ± 0.74 |
-| Micro-F1 | **29.71 ± 2.08** | 23.11 ± 2.36 | **57.12 ± 0.12** | 24.50 ± 0.33 |
-| Top-1 | **34.53 ± 1.82** | 28.53 ± 1.82 | **49.70 ± 0.26** | 38.03 ± 0.26 |
-
-Paired Wilcoxon signed-rank on row-centering: **p = 0.004** (Charades),
-**p = 0.031** (ADL). Paired *t*-test across runs: **p < 10⁻⁵**.
-
-Reproduce with section 8 of [`tools/ablations.ipynb`](tools/ablations.ipynb):
-
 ```python
 STATS = stats_report(DATA_DIR, UNITS, FEAT_SUFFIX, n_runs=5)
 ```
 
 ---
-
-## Efficiency
-
-Measured on 100-frame windows from Charades (N = 100, C = 39 classes), excluding
-the frozen backbone.
-
-| Module | Params (M) | GFLOPs | Learnable |
-|---|---|---|---|
-| DEFT + EfficientNet-B0 | 0.869 | — | yes |
-| Co-attention fusion | 3.278 | — | yes |
-| CSVG (graph construction) | — | 0.026 | **no** |
-| Per-class random walk | — | 0.004 | **no** |
-| Multi-Action Head | — | 0.002 | **no** |
-| **Full pipeline** | **4.147** | **0.032** | — |
-
-Peak memory **0.55 GB**. Three of the five stages have **zero learned
-parameters** — propagation and decoding are pure matrix arithmetic.
 
 Verify the parameter counts against your build:
 
@@ -299,23 +150,7 @@ Co-attn fusion    : 3.278M   (paper 3.278M)
 Total trainable   : 4.147M   (paper 4.147M)
 ```
 
-### Complexity
 
-| Stage | Complexity |
-|---|---|
-| EfficientNet-B0 feature extraction | O(N·D·K²) |
-| DEFT + co-attention fusion | O(N·D) |
-| CSVG pairwise affinities | O(N²·D) |
-| CSVG cumulative neighbourhood selection | O(N² log N) |
-| Independent per-class propagation | O(t·\|E\|·C) |
-| Multi-Action Head | O(N·C) |
-
-With `D`, `K`, `t`, `C` fixed in practice, SMART is **O(N²)** in the window size
-and memory is **O(N²)** for the sparse graph and transition matrix. Because
-windows are fixed-size and non-overlapping, cost scales **linearly with video
-length**.
-
----
 
 ## Repository Structure
 
@@ -345,27 +180,6 @@ Generated at runtime and **not tracked** (see `.gitignore`): `artifacts/`
 (targets, seeds, features) and `checkpoints/` (weights). These ship through
 GitHub Releases instead — a single feature file is several MB.
 
-### Paper section → code map
-
-| Paper | Code |
-|---|---|
-| Eq. 1 — DEFT | `model.py :: DEFT` |
-| Eq. 2 — co-attention fusion | `model.py :: CoAttnFusion` |
-| Eq. 3 — Asymmetric Loss | `model.py :: ASL` |
-| Eq. 4–6 — mean-centering, cosine distance, adaptive affinity | `tools/graph.py :: normalize_features, pdf_weights` |
-| Eq. 7–8 — CDF sparsification | `tools/graph.py :: cdf_sparsify` |
-| Eq. 9 — transition matrix | `tools/graph.py :: transition_matrix` |
-| Eq. 10 — independent per-class walk | `tools/graph.py :: propagate` |
-| Eq. 11 — stationary subtraction | `tools/head.py :: h71_stationary` |
-| Eq. 12 — standardisation | `tools/head.py :: h72_calibrate` |
-| Eq. 13 — temporal moving average | `tools/head.py :: h73_smooth` |
-| Eq. 14 — co-occurrence refinement | `tools/head.py :: h74_cooccur` |
-| Eq. 15 — row-centering | `tools/head.py :: head_transform` (`row_center=True`) |
-| Eq. 16 — class-specific thresholds | `tools/head.py :: fit_thresholds, h75_threshold` |
-| Algorithm 1 | `evaluate.py :: score_unit, run_unit` |
-| Joint-propagation baseline (Table 5) | `tools/graph.py :: propagate_joint` |
-
----
 
 ## Installation
 
@@ -588,61 +402,6 @@ Extras:
 
 ---
 
-## Hyperparameters
-
-Exactly as reported in Section 4.2 of the paper.
-
-| Parameter | Value | Flag |
-|---|---|---|
-| Input resolution | 224 × 224 | `--img_size` |
-| Backbone | EfficientNet-B0 (**frozen**) | `--backbone` |
-| Fine-tuned modules | DEFT + co-attention fusion | — |
-| Epochs | 3 | `--epochs` |
-| Optimizer | Adam | — |
-| Learning rate | 1e-3 | `--lr` |
-| Weight decay | 1e-3 | `--weight_decay` |
-| DEFT branch learning rate | 5e-3 | `--deft_lr` |
-| Loss | Asymmetric Loss | `--loss` |
-| Batch size | 32 | `--batch` |
-| **Window size N** | **100** (non-overlapping) | `--window` |
-| **CDF threshold γ** | **0.90** | `--gamma` |
-| **Propagation steps t** | **10** | `--rw_steps` |
-| Kernel bandwidth σ | median pairwise distance per window | `--sigma_mode` |
-| Feature normalisation | per-window mean-centering | `--feat_norm` |
-| Seed fraction | 10% of labelled frames | `--seed_frac` |
-| Min seeds per class | 2 | `--min_per_class` |
-| Random seed | 42 | `--seed` |
-| Threshold criterion | F-β, **β = 0.5** | `--fbeta` |
-| Temporal smoothing radius | 5 | `--w_smooth` |
-| Co-occurrence weight λ | 0.3 | `--lam` |
-| Row-centering | **on** | `--no_row_center` disables |
-| Max labels per frame | 3 | `--max_k` |
-
-DEFT gets a 5× higher learning rate than the fusion because its gradient is the
-weakest in the chain — it arrives through a frozen encoder.
-
-> **Note on the embedding dimension.** Section 3.1 of the paper states *d* = 512,
-> but the parameter counts in Table 9 correspond to the native EfficientNet-B0
-> dimension *d* = 1280 (the fusion's `Linear(2·1280 → 1280)` is exactly 3.278M
-> parameters). This implementation uses the backbone's native dimension and
-> therefore reproduces Table 9 exactly — see the Efficiency section above.
-
----
-
-## Evaluation Protocol
-
-Full detail in [`Splits/README.txt`](Splits/README.txt).
-
-- Seeds are 10% of a unit's **labelled** frames, drawn so every class present
-  contributes at least 2, with the remainder sampled at random.
-- Seed frames are **excluded from evaluation** — scoring them would inflate every
-  metric.
-- `per_unit` (default): each unit runs independently; metrics averaged with equal
-  weight per unit.
-- `pooled`: per-unit graphs, but global co-occurrence, global thresholds, and
-  metrics pooled over every non-seed frame.
-- Metrics: **mAP** (ranking quality of the propagated scores) and **Top-1**
-  (dominant action correctness), plus macro/micro F1.
 
 ---
 
