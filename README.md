@@ -697,9 +697,10 @@ graph, seed initialisation, propagated labels) is produced by
 
 ## Related Work by the Authors
 
-- **DEFT-DPT** — the feature transformation module reused here.
+- **DEFT-DPT**: A Lightweight Multimodal Framework for Egocentric Video Action Recognition.
   Vishwakarma, Singh & Sahu, *IEEE TCSVT*, 2026.
-- **EgoHAnG** — graph-enhanced horizon-aware egocentric action anticipation.
+  [github.com/pawanesh-mnnit/deft-dpt](https://pawanesh-mnnit.github.io/deft-dpt/)
+- **EgoHAnG**: Graph-Enhanced Horizon-Aware Egocentric Action Anticipation.
   Vishwakarma, Chowdhury & Sahu, *ICPR*, 2026.
   [github.com/pawanesh-mnnit/EgoHANG](https://github.com/pawanesh-mnnit/EgoHANG)
 
@@ -717,8 +718,7 @@ Future work extends the multi-action framework here with action anticipation.
                Graphics and Image Processing (ICVGIP'26)},
   year      = {2026},
   address   = {Kolkata, India},
-  publisher = {ACM},
-  doi       = {10.1145/nnnnnnn.nnnnnnn}
+  publisher = {ACM}
 }
 ```
 
