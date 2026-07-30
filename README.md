@@ -69,7 +69,7 @@ frames light up every class at once. The head removes them in sequence:
 stationary subtraction → per-class standardisation → temporal moving average →
 co-occurrence refinement → **row-centering**.
 
-![Architecture](images/SMART_Architecture_Diagram.png)
+![Architecture](images/SMART_Architeture_Diagram.png)
 
 Row-centering is the key contribution. Writing the propagated score as
 `S_ic = a_i + b_ic`, where `a_i` is the frame-level activity shared across classes
