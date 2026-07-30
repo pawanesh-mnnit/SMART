@@ -27,7 +27,7 @@ frames**. Since so few labels cannot train a reliable classifier directly, SMART
 instead exploits the intrinsic structure of video: labels are propagated over a
 graph connecting visually and temporally related frames.
 
-![Problem formulation](images/SMART_Problem_Formulation.png)
+![Problem formulation](images/SMART_Problem_Formulation_Diagram.png)
 
 Existing graph-based propagation methods are built for the single-label case —
 they diffuse all classes jointly and decode with `argmax`, which forces one
@@ -69,7 +69,7 @@ frames light up every class at once. The head removes them in sequence:
 stationary subtraction → per-class standardisation → temporal moving average →
 co-occurrence refinement → **row-centering**.
 
-![Architecture](images/SMART_Architecture.png)
+![Architecture](images/SMART_Architecture_Diagram.png)
 
 Row-centering is the key contribution. Writing the propagated score as
 `S_ic = a_i + b_ic`, where `a_i` is the frame-level activity shared across classes
