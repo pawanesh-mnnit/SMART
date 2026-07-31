@@ -1,8 +1,4 @@
-# ---------------------------------------------------------------------------
-# Heavy artifacts — these belong in GitHub Releases, NOT in the repository.
-# A single ADL feature file is several MB; committing them makes the repo
-# unusable to clone.
-# ---------------------------------------------------------------------------
+
 artifacts/
 artifacts_*/
 checkpoints/
