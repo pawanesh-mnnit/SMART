@@ -1,22 +1,3 @@
-"""
-tools/head.py — the layered multi-action head.
-
-Raw random-walk scores are not directly comparable across frames or classes.
-The head applies four transforms and then decodes a label SET per frame:
-
-    7.1  stationary subtraction   remove the graph's structural prior
-    7.2  calibration              per-class z-score across the video
-    7.3  temporal smoothing       moving average over W_SMOOTH frames
-    7.4  co-occurrence boost      classes that co-occur in the seeds reinforce
-    (+)  row centering            per-frame across-class centering
-
-    decode: per-class F-beta thresholds (default) or rank-gap set decoding
-
-Row centering is what turns this from a single-action into a multi-action head:
-it subtracts each frame's mean score across classes, removing the shared
-"how much is happening here" component and leaving only the which-action signal.
-"""
-
 import numpy as np
 
 __all__ = [
