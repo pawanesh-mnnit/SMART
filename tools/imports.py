@@ -1,11 +1,3 @@
-"""
-tools/imports.py — common imports and small shared helpers.
-
-Every script in SMART starts with `from tools.imports import *` so that the
-scientific-stack imports, the device string and the shape/range check helper
-are defined in exactly one place.
-"""
-
 import argparse
 import csv
 import json
