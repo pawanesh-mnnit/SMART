@@ -1,12 +1,3 @@
-"""
-tools/metrics.py — evaluation metrics for multi-label per-frame prediction.
-
-Lead metric is mAP (mean over classes present in the evaluated frames).
-All metrics are nan-safe and pooled globally over the evaluated (non-seed)
-frames; classes with no positives are skipped rather than counted as zero,
-which would otherwise deflate macro scores on the long tail.
-"""
-
 import numpy as np
 
 __all__ = [
