@@ -1,39 +1,3 @@
-"""
-dataset.py — Step 1 of the SMART pipeline.
-
-Builds, for each unit (an ADL participant or a Charades video):
-
-  * a GLOBAL class map            non-contiguous action ids -> contiguous 0..C-1
-  * per-frame MULTI-HOT targets   overlapping segments OR-accumulate, so a frame
-                                  carrying two concurrent actions has two ones
-  * N-frame WINDOWS               the graph units used downstream
-  * a stratified SEED MASK        the ~10% of labelled frames that keep their
-                                  label; everything else is predicted
-
-The class map is built over ALL units together, so participants/videos share a
-label space and can be pooled at evaluation time.
-
-Outputs (one .npz per unit + one shared class_map.pkl):
-
-    artifacts/<dataset>/class_map.pkl
-    artifacts/<dataset>/<unit>_data.npz   -> targets, seeds, windows
-
-Usage
------
-    python dataset.py --dataset adl \
-        --rgb_root  /path/to/ADL/Frames \
-        --anno_root ADL/Labels \
-        --out_dir   artifacts/adl \
-        --units P_09 P_10 P_11 P_12 P_16 P_17 \
-        --window 100 --seed_frac 0.10
-
-    python dataset.py --dataset charades \
-        --rgb_root  /path/to/Charades/RGB \
-        --anno_csv  Charades/Labels/Charades_Annotation.csv \
-        --out_dir   artifacts/charades \
-        --window 60 --seed_frac 0.10
-"""
-
 from tools.imports import *  # noqa: F403
 from tools.graph import make_windows
 
