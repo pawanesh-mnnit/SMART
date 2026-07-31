@@ -1,28 +1,3 @@
-"""
-extract_features.py — Step 3 of the SMART pipeline.
-
-Runs the trained DEFT + fusion front-end over EVERY frame of every unit and
-writes one feature matrix per unit:
-
-    <out_dir>/<unit>_feats<suffix>.npz   ->  feats (n_frames, FEAT_DIM)
-
-The suffix encodes the configuration ('', '_resnet', '_effnet', '_clip',
-'_rgbonly', '_flowonly') so several feature sets can coexist in one folder and
-evaluate.py can pick between them with --feat_suffix. That is how the
-feature-level ablations are run without touching the graph code.
-
-The classifier head is not loaded here — only the embedding path is used.
-
-Usage
------
-    python extract_features.py \
-        --checkpoint checkpoints/adl_deft_fusion_resnet.pt \
-        --rgb_root  /path/to/ADL/Frames \
-        --flow_root /path/to/ADL/OpticalFlow \
-        --data_dir  artifacts/adl \
-        --out_dir   artifacts/adl
-"""
-
 from tools.imports import *  # noqa: F403
 from model import SMARTFrontEnd, build_transforms
 from dataset import rgb_dir, flow_dir, frame_name, num_frames
