@@ -1,38 +1,4 @@
-"""
-evaluate.py — Step 4 of the SMART pipeline (the method itself).
-
-For each unit and each N-frame window:
-
-    features -> PDF graph -> CDF/kNN sparsify -> temporal edges -> transition P
-             -> one independent random walk per class (from the 10% seeds)
-             -> layered multi-action head
-             -> label sets on the non-seed frames -> mAP / micro-F1 / macro-F1
-
-Two evaluation protocols:
-
-  per_unit  (default, the headline number) — run each unit at a fixed config and
-            average the metrics across units with equal weight. Thresholds and
-            co-occurrence are fitted on that unit's own seeds.
-
-  pooled    — graphs are still built per unit (similarity and temporal edges only
-            make sense inside one video), but the co-occurrence matrix and the
-            per-class thresholds are fitted on the POOLED seeds and metrics are
-            pooled over every non-seed frame. Requires a shared class map, i.e.
-            dataset.py must have been run over all units together.
-
-Seed frames are always excluded from evaluation — they are the given 10%.
-
-Usage
------
-    python evaluate.py --data_dir artifacts/adl --feat_suffix _resnet \
-        --units P_09 P_10 P_11 P_12 P_16 P_17 \
-        --window 150 --rw_steps 10 --gamma 0.90
-
-    python evaluate.py --data_dir artifacts/charades --feat_suffix _resnet \
-        --window 60 --rw_steps 10 --protocol pooled
-"""
-
-from tools.imports import *  # noqa: F403
+from tools.imports import * 
 from tools.graph import (build_window_graph, make_windows, propagate_dispatch)
 from tools.head import (cooccurrence, head_transform, fit_thresholds,
                         h75_threshold, decode_rankgap)
