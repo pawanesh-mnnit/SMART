@@ -1,31 +1,3 @@
-"""
-model.py — the SMART feature front-end.
-
-Three trainable pieces sit in front of a frozen image encoder:
-
-  DEFT           Deformable Egocentric Focus Transform. A bounded spatial
-                 transformer plus a fixed Gaussian centre prior. The STN learns
-                 a small affine warp (deviation from identity is clamped), the
-                 Gaussian down-weights the periphery. Together they pull the
-                 encoder's attention onto the hands/objects region that carries
-                 the action, instead of the wall the camera happens to face.
-
-  CoAttnFusion   Cross-modal co-attention over the RGB and flow embeddings. A
-                 scalar agreement term a = <rgb_hat, flow_hat> gates how much
-                 each stream injects into the other, then a learned linear layer
-                 projects the concatenation back to FEAT_DIM.
-
-  head           A linear multi-label classifier. It exists ONLY to supervise
-                 DEFT and the fusion on the seed frames; it is discarded before
-                 feature extraction.
-
-  ASL            Asymmetric Loss — multi-label objective that down-weights easy
-                 negatives, which dominate on a long-tailed per-frame label set.
-
-Backbones (all frozen unless --finetune_block is passed):
-    resnet18 (512)  resnet50 (2048)  efficientnet_b0 (1280)  clip (512)
-"""
-
 from tools.imports import *  # noqa: F403
 
 __all__ = ["DEFT", "CoAttnFusion", "ASL", "make_backbone",
