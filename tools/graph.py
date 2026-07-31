@@ -1,23 +1,3 @@
-"""
-tools/graph.py — graph construction and random-walk label propagation.
-
-Pipeline for one N-frame window of D-dimensional features:
-
-    F  ->  normalize_features   (per-window mean-centering; removes the scene DC term)
-       ->  pdf_weights          (cosine similarity -> distance -> Gaussian PDF kernel)
-       ->  sparsify             (CDF cumulative-mass pruning, or fixed top-k kNN)
-       ->  add_temporal_edges   (chain edges between consecutive frames)
-       ->  transition_matrix    (column-normalized -> column-stochastic P)
-       ->  propagate            (one independent random walk per class)
-
-`propagate_joint` is the classical single-diffusion baseline in which classes
-compete for probability mass; it exists only for the propagation ablation.
-
-All functions are pure — every knob is an explicit argument, so the module can
-be imported by evaluate.py, the ablation notebook and the visualisation
-notebook without any shared global state.
-"""
-
 import numpy as np
 
 __all__ = [
