@@ -1,32 +1,4 @@
-"""
-train.py — Step 2 of the SMART pipeline.
-
-Trains DEFT + the co-attention fusion + a throwaway linear head on the ~10%
-SEED frames pooled across all units, with the image encoder frozen (optionally
-unfreezing one ResNet block). The objective is Asymmetric Loss over the
-multi-hot targets.
-
-The head is discarded afterwards: its only job is to give DEFT and the fusion a
-gradient, so that the features written by extract_features.py are focused on the
-action region rather than the scene.
-
-Keep the epoch count small. There are only a few hundred seed frames — 3 epochs
-is the default for the frozen-encoder configurations, 15 only when a backbone
-block is being fine-tuned. Training until the seed loss bottoms out memorises
-the seeds and the propagated scores get worse, not better.
-
-Usage
------
-    python train.py --dataset adl \
-        --rgb_root  /path/to/ADL/Frames \
-        --flow_root /path/to/ADL/OpticalFlow \
-        --data_dir  artifacts/adl \
-        --units P_09 P_10 P_11 P_12 P_16 P_17 \
-        --backbone resnet50 --epochs 3 \
-        --save_path checkpoints/adl_deft_fusion_resnet.pt
-"""
-
-from tools.imports import *  # noqa: F403
+from tools.imports import *
 from model import ASL, SMARTFrontEnd, build_transforms, BACKBONE_SUFFIX
 from dataset import rgb_dir, flow_dir, frame_name
 
