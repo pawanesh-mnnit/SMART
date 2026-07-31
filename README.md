@@ -8,9 +8,8 @@
 > **Pawanesh Kumar Vishwakarma, Abhimanyu Sahu**
 > Department of Computer Science & Engineering,
 > Motilal Nehru National Institute of Technology Allahabad, Prayagraj, India
-> **ICVGIP'26** — 17th Indian Conference on Computer Vision, Graphics and Image Processing, Kolkata, India
+> 
 
-**SMART** = **S**emi-supervised **M**ulti-**A**ction **R**ecogni**T**ion
 
 ---
 
@@ -29,129 +28,7 @@ graph connecting visually and temporally related frames.
 
 ![Problem formulation](images/SMART_Problem_Formulation_Diagram.png)
 
-Existing graph-based propagation methods are built for the single-label case —
-they diffuse all classes jointly and decode with `argmax`, which forces one
-action per frame and cannot represent concurrency at all. SMART addresses this
-with four components:
-
-**1 — Multimodal feature extraction.**
-Each frame passes through **DEFT** (*Dynamic Egocentric Feature Transformation*),
-which estimates a bounded affine transformation to spatially align the
-hand–object interaction region while preserving global scene context. The
-localised frame and its optical flow are encoded by a **frozen EfficientNet-B0**
-and fused by a **co-attention** module. DEFT and the fusion are fine-tuned on the
-seed frames alone, under **Asymmetric Loss**.
-
-**2 — Cumulative Sparse Video Graph (CSVG).**
-Fully connected graphs carry many weak, noisy edges; fixed *k*-NN graphs keep the
-same number of neighbours regardless of the local feature distribution — a poor
-fit for egocentric video, where appearance similarity varies sharply between
-windows. CSVG mean-centres features inside each window, converts cosine distance
-into Gaussian affinities with a bandwidth `σ = median{d_ij}` estimated *from that
-window*, then keeps, per frame, the smallest neighbourhood whose cumulative
-normalised affinity exceeds `γ`. Confident frames get compact neighbourhoods,
-ambiguous ones get larger. Temporal edges between consecutive frames preserve
-continuity.
-
-**3 — Independent per-class label propagation.**
-Each action class runs its **own** random walk over the shared transition matrix,
-with seed frames clamped to their ground-truth labels after every iteration.
-Because the walks never compete, multiple actions accumulate evidence on the same
-frame simultaneously. This is the single design choice that makes concurrency
-possible: replacing it with conventional joint propagation costs **10.1 mAP on
-Charades and 35.7 mAP on ADL**.
-
-**4 — Multi-Action Head with row-centering.**
-Propagated scores are contaminated by three factors: the stationary bias of graph
-diffusion, unequal seed counts across classes, and — most importantly — a
-frame-level activity component shared by all classes, which makes highly active
-frames light up every class at once. The head removes them in sequence:
-stationary subtraction → per-class standardisation → temporal moving average →
-co-occurrence refinement → **row-centering**.
-
-![Architecture](images/SMART_Architeture_Diagram.png)
-
-Row-centering is the key contribution. Writing the propagated score as
-`S_ic = a_i + b_ic`, where `a_i` is the frame-level activity shared across classes
-and `b_ic` the class-specific evidence, subtracting each frame's mean across
-classes removes `a_i` **exactly**:
-
-```
-S̃_ic  =  S_ic − (1/C) Σ_c' S_ic'  =  b_ic − b̄_i
-```
-
-Within-frame ranking is untouched (so top-1 is unchanged), but *across* frames the
-score now depends only on `b_ic`. Removing it costs **15.7 mAP on Charades and
-8.4 mAP on ADL**.
-
----
-
-
-
-```bash
-python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 100 --rw_steps 10 --gamma 0.90
-python evaluate.py --data_dir artifacts/adl      --feat_suffix _effnet --window 100 --rw_steps 10 --gamma 0.90
-```
-
----
-
-```bash
-python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 100 --no_row_center
-python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 100 --no_cdf
-python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 100 --no_temporal
-# w/o DEFT requires re-extraction with a DEFT-free front-end
-```
-
-```bash
-python evaluate.py --data_dir artifacts/adl --feat_suffix _effnet --window 100 --prop_mode joint
-```
-
-```bash
-python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 100 --sparsify knn --knn_k 10
-python evaluate.py --data_dir artifacts/charades --feat_suffix _effnet --window 100 --gamma 0.85
-```
-
-Each row needs its own `extract_features.py` run; then it is only a different
-`--feat_suffix`:
-
-```bash
-python train.py ... --loss bce      # vs the default --loss asl
-```
-
----
-
-```python
-STATS = stats_report(DATA_DIR, UNITS, FEAT_SUFFIX, n_runs=5)
-```
-
----
-
-Verify the parameter counts against your build:
-
-```bash
-python -c "
-import torch
-from model import SMARTFrontEnd
-m = SMARTFrontEnd('efficientnet_b0', num_classes=39, modality='fusion', device='cpu')
-with torch.no_grad(): m.deft.theta(torch.randn(1,3,224,224))   # build DEFT's lazy fc
-deft = sum(p.numel() for p in m.deft.parameters())
-fus  = sum(p.numel() for p in m.fusion.parameters())
-print(f'DEFT              : {deft/1e6:.3f}M   (paper 0.869M)')
-print(f'Co-attn fusion    : {fus/1e6:.3f}M   (paper 3.278M)')
-print(f'Total trainable   : {(deft+fus)/1e6:.3f}M   (paper 4.147M)')
-"
-```
-
-Expected — these reproduce Table 9 of the paper exactly:
-
-```
-DEFT              : 0.869M   (paper 0.869M)
-Co-attn fusion    : 3.278M   (paper 3.278M)
-Total trainable   : 4.147M   (paper 4.147M)
-```
-
-
-
+----
 ## Repository Structure
 
 ```
