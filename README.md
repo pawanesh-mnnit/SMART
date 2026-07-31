@@ -170,8 +170,8 @@ SMART/
 │   ├── metrics.py          # mAP, macro/micro F1, Top-1, LRAP
 │   ├── ablations.ipynb     # every table above + sweeps + significance testing
 │   └── visualize_graph.ipynb  # Figure 5: per-class propagation over the graph
-├── ADL/Labels/             # per-participant annotation CSVs
-├── Charades/Labels/        # the Charades annotation CSV
+├── ADL/           
+├── Charades/     
 ├── Splits/                 # seed-mask protocol (README.txt)
 └── images/                 # figures
 ```
